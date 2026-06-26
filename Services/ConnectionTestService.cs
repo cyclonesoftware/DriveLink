@@ -26,6 +26,18 @@ public sealed class ConnectionTestService
             return validationResult;
         }
 
+        // A password-mode connection set to AskAtConnect stores no secret, so the
+        // network test below would reach BuildConnectionInfo with a null password and
+        // fail. Short-circuit cleanly here: this is the deliberate mode, not a failure.
+        if (profile.RequiresSecretPrompt && profile.AuthMode == AuthMode.Password)
+        {
+            var promptResult = ConnectionTestResult.From(profile, steps, trustedFingerprint, receivedFingerprint);
+            LoggingService.Info("ConnectionTestSkipped",
+                "Connection test skipped: password is supplied at connect time.",
+                profile);
+            return promptResult;
+        }
+
         await Task.Run(() =>
         {
             try
@@ -220,6 +232,12 @@ public sealed class ConnectionTestService
                     "Private key",
                     "Private key file was found."));
             }
+        }
+        else if (profile.RequiresSecretPrompt)
+        {
+            steps.Add(ConnectionTestStep.Passed(
+                "Password",
+                "This connection asks for its password when you connect. Use the Connect button to test it; the password can't be validated here."));
         }
         else if (!TryHasPassword(profile, steps))
         {

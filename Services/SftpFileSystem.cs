@@ -24,7 +24,7 @@ public class SftpFileSystem : FileSystemBase
     private readonly TimeSpan _negCacheTtl;
     private readonly TimeSpan _connectionTimeout;
     private readonly TimeSpan _operationTimeout;
-    private string? _hostKeyMismatchMessage;
+    private volatile string? _hostKeyMismatchMessage;
 
     // ── Dropped-connection detection ───────────────────────────────────────────
     //
@@ -970,10 +970,10 @@ public class SftpFileSystem : FileSystemBase
         fileInfo = default;
         var path = (string)fileNode;
 
+        if (_readOnly) return STATUS_ACCESS_DENIED;
+
         if (setAllocationSize)
             return GetFileInfo(path, fileDesc, out fileInfo);
-
-        if (_readOnly) return STATUS_ACCESS_DENIED;
 
         try
         {
