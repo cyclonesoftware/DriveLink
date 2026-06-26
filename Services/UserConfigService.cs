@@ -101,6 +101,16 @@ public class UserConfigService
         var idx = Config.Credentials.FindIndex(c => c.ProfileId == cred.ProfileId);
         if (idx >= 0)
         {
+            // Sentinel contract from CredentialsViewModel.ToUserCredential():
+            //   null         = fingerprint was untouched in this VM session → preserve
+            //                  whatever is stored (e.g. a fingerprint a background
+            //                  mount/TOFU wrote after the dialog opened).
+            //   string.Empty = user clicked Reset Host Key → fall through and clear it.
+            // Must be a strict null check, not IsNullOrWhiteSpace, or an intentional
+            // clear would be suppressed.
+            if (cred.HostKeyFingerprint == null)
+                cred.HostKeyFingerprint = Config.Credentials[idx].HostKeyFingerprint;
+
             Config.Credentials[idx] = cred;
         }
         else
@@ -117,7 +127,7 @@ public class UserConfigService
         {
             Config.Credentials[idx].HostKeyFingerprint = fingerprint;
         }
-        else if (fingerprint != null)
+        else if (!string.IsNullOrEmpty(fingerprint))
         {
             Config.Credentials.Add(new UserCredential
             {

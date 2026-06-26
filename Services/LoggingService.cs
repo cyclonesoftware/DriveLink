@@ -13,6 +13,7 @@ public static class LoggingService
     private const long MaxLogBytes = 1_048_576;
     public static int RetentionDays { get; set; } = 7;
     private static readonly object Lock = new();
+    private static bool _cleanedThisSession;
     private static readonly Regex SecretPattern = new(
         @"(?i)(password|passphrase|privatekeypassphraseencrypted|passwordencrypted)\s*[:=]\s*[^;\r\n]+",
         RegexOptions.Compiled);
@@ -103,12 +104,17 @@ public static class LoggingService
         try
         {
             Directory.CreateDirectory(LogDirectory);
+            var takeCount = Math.Max(0, maxLines);
             var lines = Directory.GetFiles(LogDirectory, "*.log")
-                .OrderByDescending(File.GetLastWriteTimeUtc)
-                .Take(3)
-                .SelectMany(path => File.ReadLines(path).Reverse().Take(maxLines))
-                .Take(maxLines)
-                .Reverse()
+                .OrderBy(File.GetLastWriteTimeUtc)
+                .TakeLast(3)
+                .SelectMany(path =>
+                {
+                    var all = File.ReadAllLines(path);
+                    var start = Math.Max(0, all.Length - takeCount);
+                    return all[start..];
+                })
+                .TakeLast(takeCount)
                 .Select(Redact)
                 .ToList();
 
@@ -127,7 +133,12 @@ public static class LoggingService
             try
             {
                 Directory.CreateDirectory(LogDirectory);
-                CleanupOldLogs();
+                if (!_cleanedThisSession)
+                {
+                    CleanupOldLogs();
+                    _cleanedThisSession = true;
+                }
+
                 RotateIfNeeded();
 
                 var profileText = profile is null ? string.Empty : " " + ProfileContext(profile);
@@ -171,7 +182,7 @@ public static class LoggingService
     private static string Safe(string? value) =>
         string.IsNullOrEmpty(value)
             ? string.Empty
-            : value.Replace('\r', ' ').Replace('\n', ' ').Trim();
+            : value.Replace('\r', ' ').Replace('\n', ' ').Replace('"', '\'').Trim();
 
     private static string Redact(string value) =>
         SecretPattern.Replace(value, "$1=[redacted]");
