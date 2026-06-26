@@ -1,0 +1,119 @@
+<Window x:Class="DriveLink.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings"
+        Height="380" Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgDeep}">
+
+  <Grid Margin="20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Header -->
+    <TextBlock Grid.Row="0"
+               Text="Settings"
+               Foreground="{StaticResource TextPrimary}"
+               FontSize="16" FontWeight="SemiBold"
+               Margin="0,0,0,14"/>
+
+    <!-- Settings card -->
+    <Border Grid.Row="1"
+            Background="{StaticResource BgCard}"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="1"
+            CornerRadius="8">
+      <StackPanel>
+
+        <!-- Row: Startup with Windows -->
+        <Grid Height="48" Margin="16,0">
+          <TextBlock Text="STARTUP WITH WINDOWS"
+                     Foreground="{StaticResource TextSecondary}"
+                     FontSize="11" FontWeight="SemiBold"
+                     VerticalAlignment="Center"/>
+          <ToggleButton IsChecked="{Binding AutoRun}"
+                        Style="{StaticResource ToggleSwitch}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Separator -->
+        <Border Height="1" Background="{StaticResource BorderSubtle}" Margin="16,0"/>
+
+        <!-- Row: Default dot-file visibility (replaces dummy) -->
+        <Grid Margin="16,0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <TextBlock Grid.Row="0"
+                     Text="SHOW HIDDEN FILES (DOT-FILES)"
+                     Foreground="{StaticResource TextSecondary}"
+                     FontSize="11" FontWeight="SemiBold"
+                     Margin="0,12,0,4"/>
+          <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <RadioButton Content="Hide  "
+                         IsChecked="{Binding HideDotFilesByDefault}"
+                         GroupName="DotFiles"
+                         Margin="0,0,16,0"/>
+            <RadioButton Content="Show"
+                         IsChecked="{Binding ShowDotFilesByDefault}"
+                         GroupName="DotFiles"/>
+          </StackPanel>
+        </Grid>
+
+        <!-- Separator -->
+        <Border Height="1" Background="{StaticResource BorderSubtle}" Margin="16,0"/>
+
+        <!-- Row: Log retention -->
+        <Grid Height="48" Margin="16,0">
+          <TextBlock Text="KEEP LOGS FOR"
+                     Foreground="{StaticResource TextSecondary}"
+                     FontSize="11" FontWeight="SemiBold"
+                     VerticalAlignment="Center"/>
+          <ComboBox HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Width="110"
+                    ItemsSource="{Binding LogRetentionOptions}"
+                    SelectedItem="{Binding LogRetentionDays}"/>
+        </Grid>
+
+        <!-- Separator -->
+        <Border Height="1" Background="{StaticResource BorderSubtle}" Margin="16,0"/>
+
+        <!-- Row: Logs -->
+        <Grid Height="52" Margin="16,0">
+          <TextBlock Text="DIAGNOSTICS"
+                     Foreground="{StaticResource TextSecondary}"
+                     FontSize="11" FontWeight="SemiBold"
+                     VerticalAlignment="Center"/>
+          <Button Command="{Binding ViewLogsCommand}"
+                  Width="110"
+                  Height="32"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE8A5;" Style="{StaticResource FluentIcon}"/>
+              <TextBlock Text="View Logs" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </Grid>
+
+      </StackPanel>
+    </Border>
+
+    <!-- Footer buttons -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal"
+                HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button Content="Cancel" Width="80" IsCancel="True"
+              Click="Cancel_Click" Margin="0,0,8,0"/>
+      <Button Content="OK"     Width="80" IsDefault="True"
+              Style="{StaticResource PrimaryButton}"
+              Click="Ok_Click"/>
+    </StackPanel>
+  </Grid>
+</Window>

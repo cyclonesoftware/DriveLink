@@ -1,0 +1,20 @@
+# Normalize line endings to LF in the repo, CRLF on Windows checkout
+* text=auto eol=lf
+
+# Windows-specific source files stay CRLF
+*.cs    text eol=crlf
+*.xaml  text eol=crlf
+*.xml   text eol=crlf
+*.csproj text eol=crlf
+*.sln   text eol=crlf
+*.json  text eol=crlf
+*.md    text eol=lf
+
+# Binary assets — no line-ending conversion, no diffing
+*.ico   binary
+*.png   binary
+*.jpg   binary
+*.gif   binary
+*.pdf   binary
+*.pfx   binary
+*.snk   binary

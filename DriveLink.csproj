@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>DriveLink</AssemblyName>
+    <RootNamespace>DriveLink</RootNamespace>
+    <ApplicationIcon>Resources\app-icon-blue.ico</ApplicationIcon>
+    <Version>26.3.2</Version>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="SSH.NET" Version="2025.1.0" />
+    <PackageReference Include="winfsp.net" Version="2.1.25156" />
+    <PackageReference Include="System.Text.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\app-icon-blue.ico" Condition="Exists('Resources\app-icon-blue.ico')" />
+    <Resource Include="Resources\app-icon-blue.png" Condition="Exists('Resources\app-icon-blue.png')" />
+    <Resource Include="Resources\app-icon-green.ico" Condition="Exists('Resources\app-icon-green.ico')" />
+    <Resource Include="Resources\app-icon-green.png" Condition="Exists('Resources\app-icon-green.png')" />
+  </ItemGroup>
+
+</Project>

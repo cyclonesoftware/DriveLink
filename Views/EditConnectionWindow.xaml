@@ -1,0 +1,243 @@
+<Window x:Class="DriveLink.Views.EditConnectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Connection"
+        Height="680" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgDeep}">
+
+  <Grid Margin="20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" Text="Connection"
+               Foreground="{StaticResource TextPrimary}"
+               FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <Label Content="DISPLAY NAME"/>
+        <TextBox Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+
+        <Grid Margin="0,0,0,8">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="72"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" Margin="0,0,6,0">
+            <Label Content="HOST"/>
+            <TextBox Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1">
+            <Label Content="PORT"/>
+            <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"/>
+          </StackPanel>
+        </Grid>
+
+        <Label Content="USERNAME"/>
+        <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+
+        <Label Content="AUTHENTICATION"/>
+        <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
+          <RadioButton Content="Password"    IsChecked="{Binding UsePassword}" Margin="0,0,16,0"/>
+          <RadioButton Content="Private Key" IsChecked="{Binding UseKey}"/>
+        </StackPanel>
+        <TextBlock Text="Use Password if your server requires a login password. Use Private Key for SSH key-pair authentication."
+                   Foreground="{StaticResource TextSecondary}"
+                   FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"/>
+
+        <Label>
+          <Label.Style>
+            <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+              <Setter Property="Content" Value="PASSWORD STORAGE"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding UseKey}" Value="True">
+                  <Setter Property="Content" Value="KEY PASSPHRASE STORAGE"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Label.Style>
+        </Label>
+        <StackPanel Orientation="Horizontal" Margin="0,2,0,8">
+          <RadioButton Content="Remember (encrypted)"
+                       IsChecked="{Binding SaveSecret}"
+                       Margin="0,0,16,0"/>
+          <RadioButton Content="Ask me every time"
+                       IsChecked="{Binding AskAtConnect}"/>
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding UsePassword, Converter={StaticResource BoolToVisibility}}">
+          <Label Content="PASSWORD"/>
+          <PasswordBox x:Name="PasswordBox" Margin="0,0,0,8"/>
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding UseKey, Converter={StaticResource BoolToVisibility}}">
+          <Label Content="PRIVATE KEY PATH"/>
+          <Grid Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding PrivateKeyPath}" Margin="0,0,6,0"/>
+            <Button  Grid.Column="1" Content="Browse…" Width="68"
+                     HorizontalContentAlignment="Center" Click="BrowseKey_Click"/>
+          </Grid>
+          <Button Content="Generate New Key Pair…"
+                  HorizontalAlignment="Left"
+                  Width="170"
+                  Margin="0,0,0,8"
+                  Click="GenerateKey_Click"/>
+          <Label Content="KEY PASSPHRASE (OPTIONAL)"/>
+          <PasswordBox x:Name="PassphraseBox" Margin="0,0,0,8"/>
+        </StackPanel>
+
+        <Label Content="REMOTE PATH"/>
+        <TextBox Text="{Binding RemotePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+
+        <Label Content="SSH HOST KEY"/>
+        <Border Background="{StaticResource BgCard}"
+                BorderBrush="{StaticResource BorderSubtle}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="10,8"
+                Margin="0,0,0,8">
+          <StackPanel>
+            <TextBlock Text="{Binding HostKeyStatus}"
+                       Foreground="{StaticResource TextPrimary}"
+                       FontSize="12"
+                       FontWeight="SemiBold"
+                       TextWrapping="Wrap"/>
+            <TextBlock Text="Paste a verified SHA256 fingerprint, or leave blank to trust the first key received during a successful test or connection."
+                       Foreground="{StaticResource TextSecondary}"
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,8"/>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <TextBox Grid.Column="0"
+                       Text="{Binding HostKeyFingerprint, UpdateSourceTrigger=PropertyChanged}"
+                       Margin="0,0,6,0"/>
+              <Button Grid.Column="1"
+                      Content="Reset"
+                      Width="68"
+                      IsEnabled="{Binding HasHostKeyFingerprint}"
+                      Click="ResetHostKey_Click"/>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Expander Header="Advanced" IsExpanded="False" Margin="0,0,0,12"
+                  Foreground="{StaticResource TextPrimary}">
+          <Border Background="{StaticResource BgCard}"
+                  BorderBrush="{StaticResource BorderSubtle}"
+                  BorderThickness="1"
+                  CornerRadius="6"
+                  Padding="10,8"
+                  Margin="0,8,0,0">
+            <StackPanel>
+              <CheckBox Content="Mount read-only"
+                        IsChecked="{Binding ReadOnlyMount}"
+                        Margin="0,0,0,8"/>
+
+              <Label Content="VOLUME LABEL"/>
+              <TextBox Style="{StaticResource HintTextBox}"
+                       Tag="e.g. Production Files (leave blank for drive letter only)"
+                       Text="{Binding VolumeLabel, UpdateSourceTrigger=PropertyChanged}"
+                       Margin="0,0,0,8"/>
+
+              <Label Content="CACHE DURATION  ·  seconds"/>
+              <TextBox Style="{StaticResource HintTextBox}"
+                       Tag="Default: 15 seconds"
+                       Text="{Binding CacheDurationSeconds, UpdateSourceTrigger=PropertyChanged}"
+                       Margin="0,0,0,8"/>
+
+              <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                  <Label Content="CONNECT TIMEOUT  ·  seconds"/>
+                  <TextBox Style="{StaticResource HintTextBox}"
+                           Tag="Default: 15 seconds"
+                           Text="{Binding ConnectionTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                  <Label Content="OPERATION TIMEOUT  ·  seconds"/>
+                  <TextBox Style="{StaticResource HintTextBox}"
+                           Tag="Default: 30 seconds"
+                           Text="{Binding OperationTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+              </Grid>
+
+              <Label Content="DOT FILES"/>
+              <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <RadioButton Content="Use system setting"
+                             IsChecked="{Binding UseDefaultDotFileSetting}"
+                             Margin="0,0,14,0"/>
+                <RadioButton Content="Show"
+                             IsChecked="{Binding ShowDotFilesForConnection}"
+                             Margin="0,0,14,0"/>
+                <RadioButton Content="Hide"
+                             IsChecked="{Binding HideDotFilesForConnection}"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </Expander>
+
+        <Label Content="DRIVE LETTER"/>
+        <Grid Margin="0,2,0,12">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+
+          <!-- Auto / Manual toggle pills -->
+          <Border Grid.Column="0"
+                  Background="{StaticResource BgCard}"
+                  BorderBrush="{StaticResource BorderSubtle}"
+                  BorderThickness="1" CornerRadius="6"
+                  Height="34" Padding="4">
+            <StackPanel Orientation="Horizontal">
+              <RadioButton x:Name="AutoLetterBtn"
+                           Content="Auto"
+                           IsChecked="{Binding AutoLetter}"
+                           Style="{StaticResource PillRadioButton}"
+                           Margin="0,0,2,0"/>
+              <RadioButton Content="Manual"
+                           IsChecked="{Binding ManualLetter}"
+                           Style="{StaticResource PillRadioButton}"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Drive letter ComboBox — active only when Manual -->
+          <ComboBox Grid.Column="1"
+                    ItemsSource="{Binding AvailableLetters}"
+                    SelectedItem="{Binding SelectedLetter}"
+                    IsEnabled="{Binding ManualLetter}"
+                    Width="72" Margin="8,0,0,0"/></Grid>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Grid Grid.Row="2" Margin="0,16,0,0">
+      <Button Content="Test Connection"
+              Width="120"
+              HorizontalAlignment="Left"
+              Click="TestConnection_Click"/>
+
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right">
+        <Button Content="Cancel" Width="80" IsCancel="True" Margin="0,0,8,0"/>
+        <Button Content="Save"   Width="80" IsDefault="True" Click="Save_Click"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

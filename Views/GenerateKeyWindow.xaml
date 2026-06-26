@@ -1,0 +1,80 @@
+<Window x:Class="DriveLink.Views.GenerateKeyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Generate SSH Key Pair"
+        Height="493" Width="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgDeep}">
+
+  <Grid Margin="20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Header -->
+    <TextBlock Grid.Row="0"
+               Text="Generate SSH Key Pair"
+               Foreground="{StaticResource TextPrimary}"
+               FontSize="16" FontWeight="SemiBold"
+               Margin="0,0,0,14"/>
+
+    <StackPanel Grid.Row="1">
+
+      <!-- Info banner -->
+      <Border Background="{StaticResource BgCard}"
+              BorderBrush="{StaticResource BorderSubtle}"
+              BorderThickness="1"
+              CornerRadius="6"
+              Padding="10,8"
+              Margin="0,0,0,14">
+        <TextBlock TextWrapping="Wrap" FontSize="12"
+                   Foreground="{StaticResource TextSecondary}"
+                   Text="A new RSA 4096-bit key pair has been generated.  Copy the public key to your server's authorized_keys, then save the private key to your computer."/>
+      </Border>
+
+      <!-- Public key -->
+            <Label Content="PUBLIC KEY  (add to ~/.ssh/authorized__keys on your server)" />
+      <TextBox x:Name="PublicKeyBox"
+               IsReadOnly="True"
+               TextWrapping="Wrap"
+               Height="82"
+               VerticalScrollBarVisibility="Auto"
+               FontFamily="Consolas"
+               FontSize="11"
+               Margin="0,0,0,6"/>
+      <Button x:Name="CopyBtn"
+              Content="Copy Public Key"
+              Width="130"
+              HorizontalAlignment="Left"
+              Margin="0,0,0,16"
+              Click="Copy_Click"/>
+
+      <!-- Private key save path -->
+      <Label Content="SAVE PRIVATE KEY TO"/>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="KeyPathBox" Grid.Column="0" Margin="0,0,6,0"/>
+        <Button  Grid.Column="1" Content="Browse…" Width="72" Click="Browse_Click"/>
+      </Grid>
+
+      <TextBlock Text="The file will be saved with owner-only read permissions."
+                 Foreground="{StaticResource TextSecondary}"
+                 FontSize="11"
+                 Margin="0,4,0,0"/>
+
+    </StackPanel>
+
+    <!-- Footer -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal"
+                HorizontalAlignment="Right" Margin="0,16,0,0">
+      <Button Content="Cancel"          Width="80"  IsCancel="True"    Margin="0,0,8,0"/>
+      <Button Content="Save Private Key" Width="130" IsDefault="True"   Click="Save_Click"/>
+    </StackPanel>
+  </Grid>
+</Window>
