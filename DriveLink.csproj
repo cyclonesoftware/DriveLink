@@ -10,7 +10,7 @@
     <AssemblyName>DriveLink</AssemblyName>
     <RootNamespace>DriveLink</RootNamespace>
     <ApplicationIcon>Resources\app-icon-blue.ico</ApplicationIcon>
-    <Version>26.3.2</Version>
+    <Version>2026.06.26</Version>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
